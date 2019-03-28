@@ -20,7 +20,7 @@ namespace TicTacToe
             playerNameA = Console.ReadLine();
             Console.Write("Enter the name of player B:");
             playerNameB = Console.ReadLine();
-
+        
             //...
         }
 
