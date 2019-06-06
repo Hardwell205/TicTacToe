@@ -38,9 +38,25 @@ namespace Cw_03_P2
                     gameOver = gB.MakeMove(board, boardCopy);
                     movePlayerA = true;
                 }
-                Console.ReadKey();
+                if (gameOver)
+                    break;
                 // ...
             }
+            //Game ending
+            Console.Clear();
+            DrawBoard(board);
+            Console.Write("Game over! ");
+            if (gameOver)
+            {
+                Console.WriteLine("The winner is ");
+                if (movePlayerA)
+                    Console.WriteLine(gB.Name);
+                else
+                    Console.WriteLine(gA.Name);
+            }
+            else
+                Console.WriteLine("A tie.");
+            Console.ReadKey();
         }
         ////////////////////////////////////////////////
 
@@ -109,18 +125,56 @@ namespace Cw_03_P2
             //None of the cases, so game not over yet
             return false;
         }
+        public bool PlaceSymbol(char c, char [,] board, char [,] boardCopy)
+        {
+            int height = board.GetLength(0);
+            int width = board.GetLength(1);
+            if (height != boardCopy.GetLength(0) || width != boardCopy.GetLength(1))
+                throw new Exception("Board sizes don't match!");
+            for (int i = 0; i < height; ++i)
+                for (int j = 0; j < width; ++j)
+                {
+                    if ((board[i, j] == c) && (board[i, j] == boardCopy[i, j]))
+                    {
+                        board[i, j] = Symbol;
+                        return true;
+                    }
+                }
+            return false;
+        }
     }
     class PlayerHuman : Player, IMove
     {
         public bool MakeMove(char[,] board, char[,] boardCopy)
         {
+            char chosenPlace;
+            do
+            {
+                Console.Write("Choose a free space: ");
+                chosenPlace = Console.ReadKey().KeyChar;
+                Console.WriteLine();
+            }
+            while (!PlaceSymbol(chosenPlace, board, boardCopy));
             return CheckIfGameOver(board);
         }
+        
+        
+
     }
     class PlayerComputer : Player, IMove
     {
         public bool MakeMove(char[,] board, char[,] boardCopy)
         {
+            Random rnd = new Random();
+            char chosenPlace;
+            do
+            {
+                int m = rnd.Next(1, board.Length + 1);
+                chosenPlace = m.ToString()[0];
+            }
+            while (!PlaceSymbol(chosenPlace, board, boardCopy));
+            
+
             return CheckIfGameOver(board);
         }
     }
