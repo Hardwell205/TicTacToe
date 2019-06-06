@@ -1,5 +1,7 @@
 ﻿using System;
-namespace Cw_03_P2
+using System.Threading;
+
+namespace TicTacToe
 {
     class Program
     {
@@ -11,11 +13,12 @@ namespace Cw_03_P2
             gB.Name = "Computer";
             gA.Symbol = 'x';
             gB.Symbol = 'o';
+
             char[,] board = new char[3, 3] {
-                  { '1', '2', '3' },
-                  { '4', '5', '6' },
-                  { '7', '8', '9' }
-             };
+                { '1', '2', '3' },
+                { '4', '5', '6' },
+                { '7', '8', '9' }
+            };
             char[,] boardCopy = board.Clone() as char[,];
 
             // A loop over players moves
@@ -25,12 +28,12 @@ namespace Cw_03_P2
             {
                 Console.Clear();
                 DrawBoard(board);
+
                 if (movePlayerA)
                 {
                     Console.WriteLine("Current player: " + gA.Name);
                     gameOver = gA.MakeMove(board, boardCopy);
                     movePlayerA = false;
-
                 }
                 else
                 {
@@ -38,17 +41,18 @@ namespace Cw_03_P2
                     gameOver = gB.MakeMove(board, boardCopy);
                     movePlayerA = true;
                 }
+
                 if (gameOver)
                     break;
-                // ...
             }
-            //Game ending
+
+            // Game ending
             Console.Clear();
             DrawBoard(board);
             Console.Write("Game over! ");
             if (gameOver)
             {
-                Console.WriteLine("The winner is ");
+                Console.Write("The winner is ");
                 if (movePlayerA)
                     Console.WriteLine(gB.Name);
                 else
@@ -58,6 +62,7 @@ namespace Cw_03_P2
                 Console.WriteLine("A tie.");
             Console.ReadKey();
         }
+
         ////////////////////////////////////////////////
 
         static void DrawBoard(char[,] board)
@@ -73,20 +78,27 @@ namespace Cw_03_P2
             }
         }
     }
+
+    ////////////////////////////////////////////////////
+
     interface IMove
     {
         bool MakeMove(char[,] board, char[,] boardCopy);
     }
+
     abstract class Player
     {
         public string Name { get; set; }
         public char Symbol { get; set; }
-        public bool CheckIfGameOver(char [,] board)
+
+        public bool CheckIfGameOver(char[,] board)
         {
             int height = board.GetLength(0);
             int width = board.GetLength(1);
             if (width != height)
                 throw new Exception("The board is not a square!");
+
+            // Check rows
             for (int i = 0; i < height; ++i)
             {
                 int sumOfRow = 0;
@@ -98,6 +110,7 @@ namespace Cw_03_P2
                 if (sumOfRow == width)
                     return true;
             }
+
             // Check columns
             for (int j = 0; j < width; ++j)
             {
@@ -110,6 +123,7 @@ namespace Cw_03_P2
                 if (sumOfColumn == height)
                     return true;
             }
+
             // Check diagonals
             int sumOfDiagonalA = 0;
             int sumOfDiagonalB = 0;
@@ -122,15 +136,19 @@ namespace Cw_03_P2
             }
             if (sumOfDiagonalA == width || sumOfDiagonalB == width)
                 return true;
-            //None of the cases, so game not over yet
+
+            // None of the cases, so game not over yet
             return false;
         }
-        public bool PlaceSymbol(char c, char [,] board, char [,] boardCopy)
+
+        public bool PlaceSymbol(char c, char[,] board, char[,] boardCopy)
         {
             int height = board.GetLength(0);
             int width = board.GetLength(1);
-            if (height != boardCopy.GetLength(0) || width != boardCopy.GetLength(1))
+            if (height != boardCopy.GetLength(0) ||
+                width != boardCopy.GetLength(1))
                 throw new Exception("Board sizes don't match!");
+
             for (int i = 0; i < height; ++i)
                 for (int j = 0; j < width; ++j)
                 {
@@ -140,9 +158,11 @@ namespace Cw_03_P2
                         return true;
                     }
                 }
+
             return false;
         }
     }
+
     class PlayerHuman : Player, IMove
     {
         public bool MakeMove(char[,] board, char[,] boardCopy)
@@ -155,12 +175,11 @@ namespace Cw_03_P2
                 Console.WriteLine();
             }
             while (!PlaceSymbol(chosenPlace, board, boardCopy));
+
             return CheckIfGameOver(board);
         }
-        
-        
-
     }
+
     class PlayerComputer : Player, IMove
     {
         public bool MakeMove(char[,] board, char[,] boardCopy)
@@ -173,7 +192,7 @@ namespace Cw_03_P2
                 chosenPlace = m.ToString()[0];
             }
             while (!PlaceSymbol(chosenPlace, board, boardCopy));
-            
+            Thread.Sleep(2000);
 
             return CheckIfGameOver(board);
         }
